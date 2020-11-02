@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-database-primer
+  labels:
+    app: config-database-primer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-database-primer
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: config-database-primer
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/norbinto/config-database-primer:1.0
+          imagePullPolicy: Always
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-database-primer
+spec:
+  selector:
+    app: config-database-primer
+  ports:
+    - protocol: TCP
+      port: 18136
+      targetPort: 18136

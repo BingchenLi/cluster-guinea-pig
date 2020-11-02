@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: dynamic-config-ingress
+spec:
+  rules:
+    - host: dynamic-config.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              serviceName: config-management-web
+              servicePort: 8081

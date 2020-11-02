@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-management-web
+  labels:
+    app: config-management-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-management-web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: config-management-web
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/norbinto/config-management-web:1.0
+          imagePullPolicy: Always
+          env:
+            - name: REDIS
+              value: redis
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-management-web
+spec:
+  selector:
+    app: config-management-web
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 80

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api-probe
+spec:
+  containers:
+    - name: name
+      image: ghcr.io/norbinto/api:1.0
+      imagePullPolicy: Always
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 80
+          httpHeaders:
+            - name: "Status-Code"
+              value: "200"
+        initialDelaySeconds: 3
+        periodSeconds: 3
+      env:
+        - name: REDIS
+          value: dynamic-config-redis-storage
+  imagePullSecrets:
+    - name: dockerconfigjson-github-com

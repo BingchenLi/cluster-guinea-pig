@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-service-a
+  labels:
+    app: client-service-a
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-service-a
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: client-service-a
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/norbinto/client-service-a:1.0
+          imagePullPolicy: Always
+          env:
+            - name: DYNAMIC_CONFIG_STORAGE_CONNECTION_STRING
+              value: http://dynamic-config-storage-api:80
+            - name: DYNAMIC_CONFIG_REFRESH_INTERVAL_MS
+              value: "10000"
+            - name: DYNAMIC_CONFIG_APPLICATION_NAME
+              value: SERVICE-A
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-service-a-service
+spec:
+  selector:
+    app: client-service-a
+  ports:
+    - protocol: TCP
+      port: 81
